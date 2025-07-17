@@ -1,40 +1,45 @@
-import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
-import * as express from 'express';
-import * as path from 'path';
+import { ValidationPipe } from '@nestjs/common';
 import * as dotenv from 'dotenv';
 import * as bodyParser from 'body-parser';
+import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 
-dotenv.config(); 
+dotenv.config();
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  app.enableCors({
-    origin: process.env.FRONTEND_URL, 
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-    credentials: true,
-  });
+
+  // Configuración CORS para desarrollo
+  if (process.env.NODE_ENV === 'development') {
+    app.enableCors({
+      origin: true, // Permite todos los orígenes en desarrollo
+      credentials: true,
+      methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+      allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
+    });
+  } else {
+    // Configuración CORS para producción
+    const allowedOrigins = process.env.FRONTEND_URL 
+      ? process.env.FRONTEND_URL.split(',').map(url => url.trim())
+      : ['http://localhost:3001'];
+    
+    app.enableCors({
+      origin: allowedOrigins,
+      credentials: true,
+      methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+      allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
+    });
+  }
 
   app.use(bodyParser.json());
-
   app.setGlobalPrefix('api/v1');
-
-  app.useGlobalPipes(
-    new ValidationPipe({
-      whitelist: true,
-      forbidNonWhitelisted: true,
-      transform: true,
-    }),
-  );
-
+  app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
 
   const config = new DocumentBuilder()
     .setTitle('INVENTARIO')
     .setDescription('PCS')
     .setVersion('1.0')
-    .addTag('INVENTARIO')
     .addBearerAuth()
     .build();
 
@@ -42,7 +47,9 @@ async function bootstrap() {
   SwaggerModule.setup('INVENTARIO', app, document);
 
   const port = process.env.PORT || 3000;
-  await app.listen(port, '0.0.0.0'); // Escuchar en 0.0.0.0 para acceso desde cualquier IP local
+  await app.listen(port, '0.0.0.0');
+  
+  console.log(`🚀 Servidor corriendo en puerto ${port}`);
+  console.log(`📚 Documentación disponible en: http://localhost:${port}/INVENTARIO`);
 }
-
 bootstrap();
