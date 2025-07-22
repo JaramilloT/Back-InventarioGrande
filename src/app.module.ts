@@ -17,7 +17,7 @@ import { ConfigModule } from '@nestjs/config';
       host: 'localhost',
       port: 3306,
       username: 'root',
-      password: 'jara123',
+      password: '',
       database: 'inventarioGrande',
       entities: [User, From],
       synchronize: false,
