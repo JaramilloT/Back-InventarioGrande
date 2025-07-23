@@ -22,7 +22,7 @@ async function bootstrap() {
     // Configuración CORS para producción
     const allowedOrigins = process.env.FRONTEND_URL 
       ? process.env.FRONTEND_URL.split(',').map(url => url.trim())
-      : ['http://localhost:3001'];
+      : ['https://emca-inventario.vercel.app'];
     
     app.enableCors({
       origin: allowedOrigins,
