@@ -5,6 +5,11 @@ import * as dotenv from 'dotenv';
 import * as bodyParser from 'body-parser';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 
+const port = process.env.PORT || 3000;
+// Configuración de la base de datos
+mysql://root:TuZAgGWBkTfPYKKWqFJlltTpDxHsyffJ@interchange.proxy.rlwy.net:55995/railway 
+
+
 dotenv.config();
 
 async function bootstrap() {
@@ -22,7 +27,7 @@ async function bootstrap() {
     // Configuración CORS para producción
     const allowedOrigins = process.env.FRONTEND_URL 
       ? process.env.FRONTEND_URL.split(',').map(url => url.trim())
-      : ['https://emca-inventario.vercel.app'];
+      : ['http://localhost:3001'];
     
     app.enableCors({
       origin: allowedOrigins,
@@ -49,7 +54,7 @@ async function bootstrap() {
   const port = process.env.PORT || 3000;
   await app.listen(port, '0.0.0.0');
   
-  console.log(`🚀 Servidor corriendo en puerto ${port}`);
-  console.log(`📚 Documentación disponible en: http://localhost:${port}/INVENTARIO`);
+  console.log('🚀 Servidor corriendo en puerto ${port}');
+  console.log('📚 Documentación disponible en: http://localhost:${port}/INVENTARIO');
 }
 bootstrap();
